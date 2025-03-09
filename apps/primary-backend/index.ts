@@ -1,6 +1,8 @@
 import { prismaClient } from "db/client";
 import express from "express";
 import cors from "cors";
+import { use } from "react";
+import { authMiddleware } from "./middleware";
 
 const app = express();
 
@@ -9,24 +11,25 @@ app.use(cors());
 
 
 // for creating a project
-app.post("/project", async (req, res) => {
+app.post("/project", authMiddleware, async (req, res) => {
     const { prompt } = req.body;
+    const userId = req.userId!;
 
     //TODO: add logic to get a useful name for the project from the prompt
 
     const description = prompt.split("\n")[0];
 
     const project = await prismaClient.project.create({
-        data: { description }
+        data: { description, userId }
     });
 
     res.json({ projectId: project.id });
 });
 
-app.get("/project/:projectId", async (req, res) => {
-    const { projectId } = req.params;
-    const project = await prismaClient.project.findUnique({
-        where: { id: projectId },
+app.get("/projects", authMiddleware, async (req, res) => {
+    const userId = req.userId!;
+    const project = await prismaClient.project.findFirst({
+        where: { userId },
     })
     res.json(project);
 })
