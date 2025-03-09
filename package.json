@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "StormCode",
   "private": true,
   "scripts": {
     "build": "turbo run build",
